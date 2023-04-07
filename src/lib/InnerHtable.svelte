@@ -141,7 +141,7 @@
                                 {pathSeparator}
                                 {captionOrder}
                                 {grouping}
-                                expansibleTitle={summary}
+                                {summary}
                                 {maxPathSegmentLength}
                                 {pathSegment}
                             />
