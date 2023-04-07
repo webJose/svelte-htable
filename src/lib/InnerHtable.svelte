@@ -26,7 +26,7 @@
     export let pathSeparator: string;
     export let captionOrder: number;
     export let grouping: number;
-    export let expansibleTitle: string | ((item: Item) => string) | undefined;
+    export let summary: string | ((item: Item) => string) | undefined;
     export let pathSegment: string | ((item: Item) => string) | undefined;
     export let maxPathSegmentLength: number | undefined;
 
@@ -54,14 +54,14 @@
             : items;
     $: leftCaptionText = buildLeftCaptionText();
     $: rightCaptionText = buildRightCaptionText();
-    $: getTitle = (item: Item) => {
-        if (!expansibleTitle) {
+    $: getSummary = (item: Item) => {
+        if (!summary) {
             return item[columns[0].key];
         }
-        if (typeof expansibleTitle === "string") {
-            return item[expansibleTitle];
+        if (typeof summary === "string") {
+            return item[summary];
         }
-        return expansibleTitle(item);
+        return summary(item);
     };
 
     function shouldShowLevel() {
@@ -125,11 +125,11 @@
     </thead>
     <tbody>
         {#each workItems as item}
-            <tr>
+            <tr class:sub={item.subItems?.length}>
                 {#if item.subItems?.length}
                     <td colspan={columns.length}>
                         <details>
-                            <summary>{getTitle(item)}</summary>
+                            <summary>{getSummary(item)}</summary>
                             <svelte:self
                                 {columns}
                                 items={item.subItems}
@@ -141,7 +141,7 @@
                                 {pathSeparator}
                                 {captionOrder}
                                 {grouping}
-                                {expansibleTitle}
+                                expansibleTitle={summary}
                                 {maxPathSegmentLength}
                                 {pathSegment}
                             />

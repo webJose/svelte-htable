@@ -81,7 +81,7 @@
     showLevel={true}
     showPath={true}
     captionOrder={CaptionOrder.LevelPath}
-    expansibleTitle={(i) => `${i.last_name}, ${i.first_name}`}
+    summary={(i) => `${i.last_name}, ${i.first_name}`}
     grouping={ItemGrouping.ExpansiblesFirst}
     pathSegment={(i) => i.last_name}
     pathSeparator=" > "
@@ -127,8 +127,5 @@
     }
     :global(table.data.sub) {
         background-color: rgb(23, 101, 144);
-    }
-    :global(table.data.sub-2) {
-        text-decoration: line-through;
     }
 </style>
