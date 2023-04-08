@@ -18,6 +18,7 @@
     export let pathSegment: string | ((item: Item) => string) | undefined =
         undefined;
     export let maxPathSegmentLength: number | undefined = undefined;
+    export let buildLevel: ((level: number) => string) | undefined = undefined;
 </script>
 
 <InnerHtable
@@ -32,4 +33,5 @@
     {summary}
     {pathSegment}
     {maxPathSegmentLength}
+    {buildLevel}
 />

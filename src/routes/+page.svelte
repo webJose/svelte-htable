@@ -86,6 +86,7 @@
     pathSegment={(i) => i.last_name}
     pathSeparator=" > "
     maxPathSegmentLength={10}
+    buildLevel={l => `Level: ${l}`}
 />
 
 <style>

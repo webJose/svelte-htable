@@ -29,6 +29,7 @@
     export let summary: string | ((item: Item) => string) | undefined;
     export let pathSegment: string | ((item: Item) => string) | undefined;
     export let maxPathSegmentLength: number | undefined;
+    export let buildLevel: ((level: number) => string) | undefined;
 
     let regulars: Item[] = [];
     let expansibles: Item[] = [];
@@ -64,6 +65,10 @@
         return summary(item);
     };
 
+    function buildLevelText() {
+        return buildLevel ? buildLevel(level) : level.toString();
+    }
+
     function shouldShowLevel() {
         return showLevel && level > 1;
     }
@@ -75,7 +80,7 @@
     function buildLeftCaptionText() {
         let text = "";
         if (captionOrder === CaptionOrder.LevelPath) {
-            text = shouldShowLevel() ? `Level: ${level}` : "";
+            text = shouldShowLevel() ? buildLevelText() : "";
         } else {
             text = shouldShowPath() ? path : "";
         }
@@ -86,33 +91,45 @@
         if (captionOrder === CaptionOrder.LevelPath) {
             return shouldShowPath() ? path : "";
         }
-        return shouldShowLevel() ? `Level: ${level}` : "";
+        return shouldShowLevel() ? buildLevelText() : "";
     }
 
     function calculateChildPath(item: Item) {
         let childSegment: string;
         if (pathSegment === undefined) {
             childSegment = item[columns[0].key];
-        }
-        else if (typeof pathSegment === 'string') {
+        } else if (typeof pathSegment === "string") {
             childSegment = item[pathSegment];
-        }
-        else {
+        } else {
             childSegment = pathSegment(item);
         }
-        if (maxPathSegmentLength !== undefined && childSegment.length > maxPathSegmentLength) {
-            childSegment = `${childSegment.substring(0, maxPathSegmentLength - 3)}...`;
+        if (
+            maxPathSegmentLength !== undefined &&
+            childSegment.length > maxPathSegmentLength
+        ) {
+            childSegment = `${childSegment.substring(
+                0,
+                maxPathSegmentLength - 1
+            )}&hellip;`;
         }
         return `${path}${path.length ? pathSeparator : ""}${childSegment}`;
     }
 </script>
 
-<table class={(($$restProps.class ?? '') + ((level > 1) ? ` sub sub-${level}` : ''))}>
+<table
+    class={($$restProps.class ?? "") + (level > 1 ? ` sub sub-${level}` : "")}
+>
     {#if shouldShowLevel() || shouldShowPath()}
         <caption>
             <span>
-                <span class="cpt-l">{leftCaptionText}</span>
-                <span class="cpt-r">{rightCaptionText}</span>
+                <span class="cpt-l">
+                    {#if leftCaptionText}
+                        {@html leftCaptionText}
+                    {:else}
+                        &nbsp;
+                    {/if}
+                </span>
+                <span class="cpt-r">{@html rightCaptionText}</span>
             </span>
         </caption>
     {/if}
@@ -144,6 +161,7 @@
                                 {summary}
                                 {maxPathSegmentLength}
                                 {pathSegment}
+                                {buildLevel}
                             />
                         </details>
                     </td>
