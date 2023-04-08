@@ -87,7 +87,11 @@
     pathSeparator=" > "
     maxPathSegmentLength={10}
     buildLevel={l => `Level: ${l}`}
-/>
+>
+    <svelte:fragment slot="summary" let:item>
+        <img class="flag" src="https://flagcdn.com/{item.country_code.toLowerCase()}.svg" alt={item.country_code} />&nbsp;{item.last_name},&nbsp;{item.first_name}
+    </svelte:fragment>
+</Htable>
 
 <style>
     :global(:root) {
@@ -128,5 +132,8 @@
     }
     :global(table.data.sub) {
         background-color: rgb(23, 101, 144);
+    }
+    img.flag {
+        max-height: 1em;
     }
 </style>

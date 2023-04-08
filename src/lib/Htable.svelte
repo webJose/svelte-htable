@@ -34,4 +34,8 @@
     {pathSegment}
     {maxPathSegmentLength}
     {buildLevel}
-/>
+>
+    <svelte:fragment slot="summary" let:item>
+        <slot name="summary" item={item} />
+    </svelte:fragment>
+</InnerHtable>

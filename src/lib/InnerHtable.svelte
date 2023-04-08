@@ -146,7 +146,11 @@
                 {#if item.subItems?.length}
                     <td colspan={columns.length}>
                         <details>
-                            <summary>{getSummary(item)}</summary>
+                            <summary>
+                                <slot name="summary" item={item}>
+                                    {getSummary(item)}
+                                </slot>
+                            </summary>
                             <svelte:self
                                 {columns}
                                 items={item.subItems}
@@ -162,7 +166,11 @@
                                 {maxPathSegmentLength}
                                 {pathSegment}
                                 {buildLevel}
-                            />
+                            >
+                                <svelte:fragment slot="summary" let:item>
+                                    <slot name="summary" item={item} />
+                                </svelte:fragment>
+                            </svelte:self>
                         </details>
                     </td>
                 {:else}
