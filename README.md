@@ -314,16 +314,23 @@ a very similar summary, only this one would not contain the image the summary-sl
 
 ## Controlling Column Content
 
-Usually, it is necessary to format data because the raw data could not be very friendly.  For example, dates in the 
-ISO-8601 format and not much of a looker.  To account for this, column definitions may define a `render()` function 
+It is sometimes necessary to format data because the raw data might not be very friendly.  For example, dates in the 
+ISO-8601 format are not much of a looker.  To account for this, column definitions may define a `render()` function 
 that is called to obtain the column's contents.  If the function is not defined, `svelte-htable` provides a default 
 function that only does 2 things:
 
 1. Undefined values are exchanged with empty strings.
 2. Null values are represented as `(null)`.
 
-This function can be used to create calculated columns.  The example screenshot at the top shows the **Age** column, 
-which is calculated by using the following column definition in the `columns` array:
+> **IMPORTANT**: Any empty strings are replaced by the `column` slot's default template with a non-breaking space 
+(`&nbsp;`) to ensure cell formatting, and you should too, if you opt to use the `column` slot.
+
+All render functions are given 2 arguments:  The row's item, and the column's key.
+
+### Computed Columns
+
+The `render()` function can be used to create calculated columns.  The example screenshot at the top shows the **Age** 
+column, which is calculated by using the following column definition in the `columns` array:
 
 ```ts
         {
@@ -338,10 +345,10 @@ which is calculated by using the following column definition in the `columns` ar
         },
 ```
 
-The `render()` function is given 2 arguments:  The row's item, and the column's key.
-
 This method will only take you so far, and if complex HTML is needed inside the table cell, then you must opt to use 
 the `column` slot.
+
+> **Tip**:  You can, and is encouraged to, combine the use of `render()` with the `column` slot.
 
 ### Customizing Columns With a Slot
 
@@ -360,7 +367,12 @@ This following example is what has been used to create the example screenshot:
                 target="_blank">{render(item, col.key)}</a
             >
         {:else}
-            {render(item, col.key)}
+            {@const value = render(item, col.key)}
+            {#if value}
+                {value}
+            {:else}
+                &nbsp;
+            {/if}
         {/if}
     </svelte:fragment>
 ```
@@ -370,3 +382,7 @@ function, but it is not exactly the one found in the column definition object.  
 carry a `render()` function (and therefore `col.render` may very well be `undefined`), this slot-provided function is 
 guaranteed to exist.  How?  Simple:  This is the defined `render()` function inside the column definition object, 
 **or** the default `render()` function explained in the previous section.
+
+---
+
+If you have questions or would like to report a bug, feel free to open an issue.
