@@ -89,14 +89,11 @@ Now use it as `<Htable />` in a page or component.  The following example is in 
 </script>
 <!-- Now use the component. -->
 <Htable
-    class="data"
     items={data.data}
     {columns}
     level={true}
     showPath={true}
-    captionOrder={CaptionOrder.LevelPath}
     summary={(i) => `${i.last_name}, ${i.first_name}`}
-    grouping={ItemGrouping.ExpansiblesFirst}
     pathSegment={(i) => i.last_name}
     pathSeparator=" > "
     maxPathSegmentLength={10}
@@ -105,7 +102,10 @@ Now use it as `<Htable />` in a page or component.  The following example is in 
 
 First import the Htable component, and if you need to, also import the `CaptionOrder` and the `ItemGrouping` 
 enumerations, which are used to control the order of things in sub-tables' captions as well as item ordering in the 
-tables.
+tables (not shown in the example).
+
+> **IMPORTANT**  This quickstart example will come out without styles at all.  It is up to you to provide the needed 
+styling.
 
 ## Required Data Structure
 
