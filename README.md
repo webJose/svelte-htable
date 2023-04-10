@@ -141,7 +141,7 @@ Furthermore, the `sub-X` CSS class is applied to the tables, where `X` is the ta
 1, while all immediate sub-tables are level 2.  The main table has no extra CSS classes; the immediate sub-tables will 
 have the `sub` and `sub-2` CSS classes.
 
-But that's not all.  Sub-tables also get either the `sub-odd` or `sub-odd` CSS classes depending on whether their 
+But that's not all.  Sub-tables also get either the `sub-odd` or `sub-even` CSS classes depending on whether their 
 level is odd or even.  This is helpful to achieve alternating per-table coloring.  The image shown at the beginning 
 was created using these clases to apply alternating greenish backgrounds to sub-tables.
 
