@@ -32,8 +32,19 @@
             title: "Last Name",
         },
         {
-            key: "email",
-            title: "Email",
+            key: "birth_date",
+            title: "Birth Date",
+            render: (i, k) => new Date(i[k]).toLocaleDateString(),
+        },
+        {
+            key: "age",
+            title: "Age",
+            render: (i, k) => {
+                const diff = Date.now() - Date.parse(i.birth_date);
+                return Math.floor(
+                    diff / (365 * 24 * 60 * 60 * 1000)
+                ).toString();
+            },
         },
         {
             key: "gender",
@@ -66,29 +77,37 @@
     }
 </script>
 
-<h1>Welcome to your library project</h1>
-<p>
-    Create your package using @sveltejs/package and preview/showcase your work
-    with SvelteKit
-</p>
-<p>
-    Visit <a href="https://kit.svelte.dev">kit.svelte.dev</a> to read the documentation
-</p>
 <Htable
     class="data"
     items={buildData(data.data)}
     {columns}
-    level={l => `Level: ${l}`}
+    level={(l) => `Level: ${l}`}
     showPath={true}
     captionOrder={CaptionOrder.LevelPath}
     summary={(i) => `${i.last_name}, ${i.first_name}`}
-    grouping={ItemGrouping.ExpansiblesFirst}
+    grouping={ItemGrouping.Undefined}
     pathSegment={(i) => i.last_name}
     pathSeparator=" > "
     maxPathSegmentLength={10}
 >
     <svelte:fragment slot="summary" let:item>
-        <img class="flag" src="https://flagcdn.com/{item.country_code.toLowerCase()}.svg" alt={item.country_code} />&nbsp;{item.last_name},&nbsp;{item.first_name}
+        <img
+            class="flag"
+            src="https://flagcdn.com/{item.country_code.toLowerCase()}.svg"
+            alt={item.country_code}
+        />&nbsp;{item.last_name},&nbsp;{item.first_name}
+    </svelte:fragment>
+    <svelte:fragment slot="column" let:item let:col let:render>
+        {#if col.key === "id"}
+            <span class="inverted">{render(item, col.key)}</span>
+        {:else if col.key === "country_code"}
+            <a
+                href="https://flagpedia.net/{item.country_code.toLowerCase()}"
+                target="_blank">{render(item, col.key)}</a
+            >
+        {:else}
+            {render(item, col.key)}
+        {/if}
     </svelte:fragment>
 </Htable>
 
@@ -104,40 +123,63 @@
         background-color: rgb(6, 6, 42);
     }
     :global(table.data) {
+        --tableColor: rgb(16, 16, 61);
         border: 0.15em solid var(--headerColor);
+        background-color: var(--tableColor);
     }
-    :global(table.data) :global(th) {
+    :global(table.data th) {
         background-color: var(--headerColor);
         color: var(--headerTextColor);
         padding: 0.3em 1em;
     }
-    :global(table.data) :global(td) {
+    :global(table.data a) {
+        color: goldenrod;
+        text-decoration: none;
+    }
+    :global(table.data a:hover) {
+        color: gold;
+    }
+
+    :global(table.data td) {
         padding: 0.1em 0.7em;
         color: var(--tableTextColor);
     }
-    :global(table.data) :global(summary) {
+    :global(table.data summary) {
         font-weight: 900;
         font-size: larger;
         font-style: italic;
         color: var(--expansibleTextColor);
     }
-    :global(table.data) :global(caption) {
+    :global(table.data caption) {
         font-weight: bold;
     }
-    :global(table.data) :global(.cpt-r) {
+    :global(table.data .cpt-r) {
         border: 0.2em solid var(--headerColor);
         border-radius: 0.3em;
         padding: 0.1em 0.5em;
     }
     :global(table.data.sub td) {
-        color: rgb(109, 238, 255);
+        --tableTextColor: rgb(109, 238, 255);
+        color: var(--tableTextColor);
     }
     :global(table.data.sub-even) {
-        background-color: rgb(0, 82, 123);
+        --tableColor: rgb(0, 82, 123);
+        background-color: var(--tableColor);
     }
 
     :global(table.data.sub-odd) {
-        background-color: rgb(0, 139, 185);
+        --tableColor: rgb(0, 139, 185);
+        background-color: var(--tableColor);
+    }
+
+    :global(table.data > tbody > tr > td > span.inverted) {
+        background-color: var(--tableTextColor);
+        color: var(--tableColor);
+        width: 100%;
+        display: inline-block;
+        font-weight: bold;
+        padding: 0.1em 0.3em;
+        text-align: center;
     }
 
     img.flag {

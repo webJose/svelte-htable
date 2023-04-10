@@ -1,5 +1,9 @@
 <script context="module" lang="ts">
-    export type Column = { key: string; title: string };
+    export type Column = {
+        key: string;
+        title: string;
+        render?: ((item: Item, key: string) => string) | undefined;
+    };
     export type Item = {
         id: string | number;
         subItems?: Item[] | undefined;
@@ -54,18 +58,9 @@
             : items;
     $: leftCaptionText = buildLeftCaptionText();
     $: rightCaptionText = buildRightCaptionText();
-    $: getSummary = (item: Item) => {
-        if (!summary) {
-            return item[columns[0].key];
-        }
-        if (typeof summary === "string") {
-            return item[summary];
-        }
-        return summary(item);
-    };
 
     function buildLevelText() {
-        if (typeof levelFn === 'function') {
+        if (typeof levelFn === "function") {
             return levelFn(level);
         }
         return level.toString();
@@ -73,10 +68,9 @@
 
     function shouldShowLevel() {
         let should = false;
-        if (typeof levelFn === 'boolean') {
+        if (typeof levelFn === "boolean") {
             should = levelFn;
-        }
-        else if (typeof levelFn === 'function') {
+        } else if (typeof levelFn === "function") {
             should = true;
         }
         return should && level > 1;
@@ -126,7 +120,10 @@
 </script>
 
 <table
-    class={($$restProps.class ?? "") + (level > 1 ? ` sub sub-${level} sub-${(level % 2 === 0 ? 'even' : 'odd')}` : "")}
+    class={($$restProps.class ?? "") +
+        (level > 1
+            ? ` sub sub-${level} sub-${level % 2 === 0 ? "even" : "odd"}`
+            : "")}
     data-level={level}
 >
     {#if shouldShowLevel() || shouldShowPath()}
@@ -157,9 +154,7 @@
                     <td colspan={columns.length}>
                         <details>
                             <summary>
-                                <slot name="summary" item={item}>
-                                    {getSummary(item)}
-                                </slot>
+                                <slot name="summary" {item} />
                             </summary>
                             <svelte:self
                                 {columns}
@@ -177,14 +172,19 @@
                                 {pathSegment}
                             >
                                 <svelte:fragment slot="summary" let:item>
-                                    <slot name="summary" item={item} />
+                                    <slot name="summary" {item} />
+                                </svelte:fragment>
+                                <svelte:fragment slot="column" let:item let:col>
+                                    <slot name="column" {item} {col} />
                                 </svelte:fragment>
                             </svelte:self>
                         </details>
                     </td>
                 {:else}
                     {#each columns as col}
-                        <td>{item[col.key]}</td>
+                        <td>
+                            <slot name="column" {item} {col} />
+                        </td>
                     {/each}
                 {/if}
             </tr>
