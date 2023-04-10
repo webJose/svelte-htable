@@ -98,15 +98,15 @@
         />&nbsp;{item.last_name},&nbsp;{item.first_name}
     </svelte:fragment>
     <svelte:fragment slot="column" let:item let:col let:render>
+        {@const value = render(item, col.key)}
         {#if col.key === "id"}
-            <span class="inverted">{render(item, col.key)}</span>
+            <span class="inverted">{value}</span>
         {:else if col.key === "country_code"}
             <a
                 href="https://flagpedia.net/{item.country_code.toLowerCase()}"
-                target="_blank">{render(item, col.key)}</a
+                target="_blank">{value}</a
             >
         {:else}
-            {@const value = render(item, col.key)}
             {#if value}
                 {value}
             {:else}
