@@ -78,7 +78,7 @@
     class="data"
     items={buildData(data.data)}
     {columns}
-    showLevel={true}
+    level={l => `Level: ${l}`}
     showPath={true}
     captionOrder={CaptionOrder.LevelPath}
     summary={(i) => `${i.last_name}, ${i.first_name}`}
@@ -86,7 +86,6 @@
     pathSegment={(i) => i.last_name}
     pathSeparator=" > "
     maxPathSegmentLength={10}
-    buildLevel={l => `Level: ${l}`}
 >
     <svelte:fragment slot="summary" let:item>
         <img class="flag" src="https://flagcdn.com/{item.country_code.toLowerCase()}.svg" alt={item.country_code} />&nbsp;{item.last_name},&nbsp;{item.first_name}
@@ -130,9 +129,17 @@
         border-radius: 0.3em;
         padding: 0.1em 0.5em;
     }
-    :global(table.data.sub) {
-        background-color: rgb(23, 101, 144);
+    :global(table.data.sub td) {
+        color: rgb(109, 238, 255);
     }
+    :global(table.data.sub-even) {
+        background-color: rgb(0, 82, 123);
+    }
+
+    :global(table.data.sub-odd) {
+        background-color: rgb(0, 139, 185);
+    }
+
     img.flag {
         max-height: 1em;
     }

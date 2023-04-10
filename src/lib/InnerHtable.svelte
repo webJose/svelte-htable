@@ -19,8 +19,8 @@
 <script lang="ts">
     export let columns: Column[];
     export let items: Item[];
-    export let showLevel: boolean;
     export let level = 1;
+    export let levelFn: boolean | ((level: number) => string) | undefined;
     export let showPath: boolean;
     export let path = "";
     export let pathSeparator: string;
@@ -29,7 +29,6 @@
     export let summary: string | ((item: Item) => string) | undefined;
     export let pathSegment: string | ((item: Item) => string) | undefined;
     export let maxPathSegmentLength: number | undefined;
-    export let buildLevel: ((level: number) => string) | undefined;
 
     let regulars: Item[] = [];
     let expansibles: Item[] = [];
@@ -66,11 +65,21 @@
     };
 
     function buildLevelText() {
-        return buildLevel ? buildLevel(level) : level.toString();
+        if (typeof levelFn === 'function') {
+            return levelFn(level);
+        }
+        return level.toString();
     }
 
     function shouldShowLevel() {
-        return showLevel && level > 1;
+        let should = false;
+        if (typeof levelFn === 'boolean') {
+            should = levelFn;
+        }
+        else if (typeof levelFn === 'function') {
+            should = true;
+        }
+        return should && level > 1;
     }
 
     function shouldShowPath() {
@@ -117,7 +126,8 @@
 </script>
 
 <table
-    class={($$restProps.class ?? "") + (level > 1 ? ` sub sub-${level}` : "")}
+    class={($$restProps.class ?? "") + (level > 1 ? ` sub sub-${level} sub-${(level % 2 === 0 ? 'even' : 'odd')}` : "")}
+    data-level={level}
 >
     {#if shouldShowLevel() || shouldShowPath()}
         <caption>
@@ -155,8 +165,8 @@
                                 {columns}
                                 items={item.subItems}
                                 class={$$restProps.class}
-                                {showLevel}
                                 level={level + 1}
+                                {levelFn}
                                 {showPath}
                                 path={calculateChildPath(item)}
                                 {pathSeparator}
@@ -165,7 +175,6 @@
                                 {summary}
                                 {maxPathSegmentLength}
                                 {pathSegment}
-                                {buildLevel}
                             >
                                 <svelte:fragment slot="summary" let:item>
                                     <slot name="summary" item={item} />

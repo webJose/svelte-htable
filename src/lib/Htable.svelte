@@ -8,7 +8,7 @@
 
     export let columns: Column[];
     export let items: Item[];
-    export let showLevel = false;
+    export let level: boolean | ((level: number) => string) | undefined = undefined;
     export let showPath = false;
     export let pathSeparator = ".";
     export let captionOrder: number = CaptionOrder.PathLevel;
@@ -18,14 +18,13 @@
     export let pathSegment: string | ((item: Item) => string) | undefined =
         undefined;
     export let maxPathSegmentLength: number | undefined = undefined;
-    export let buildLevel: ((level: number) => string) | undefined = undefined;
 </script>
 
 <InnerHtable
     class={$$restProps.class ?? ""}
     {columns}
     {items}
-    {showLevel}
+    levelFn={level}
     {showPath}
     {pathSeparator}
     {captionOrder}
@@ -33,7 +32,6 @@
     {summary}
     {pathSegment}
     {maxPathSegmentLength}
-    {buildLevel}
 >
     <svelte:fragment slot="summary" let:item>
         <slot name="summary" item={item} />
