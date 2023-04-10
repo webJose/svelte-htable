@@ -1,6 +1,23 @@
 {
 	"name": "svelte-htable",
 	"version": "0.0.1",
+	"license": "MIT",
+	"description": "Svelte component that creates a hierarchical (recursive) table based on hierarchical data.",
+	"keywords": [
+		"svelte",
+		"table",
+		"hierarchical table",
+		"recursive"
+	],
+	"author": "José Pablo Ramírez Vargas <webJose@gmail.com>",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/webJose/svelte-htable.git"
+	},
+	"bugs": {
+		"url": "https://github.com/webJose/svelte-htable/issues"
+	},
+	"homepage": "https://github.com/webJose/svelte-htable#readme",
 	"scripts": {
 		"dev": "vite dev",
 		"build": "vite build && npm run package",
