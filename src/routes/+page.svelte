@@ -106,7 +106,12 @@
                 target="_blank">{render(item, col.key)}</a
             >
         {:else}
-            {render(item, col.key)}
+            {@const value = render(item, col.key)}
+            {#if value}
+                {value}
+            {:else}
+                &nbsp;
+            {/if}
         {/if}
     </svelte:fragment>
 </Htable>
