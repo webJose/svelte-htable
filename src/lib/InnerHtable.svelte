@@ -1,21 +1,68 @@
 <script context="module" lang="ts">
+    /**
+     * Defines the properties expected in column definitions.
+     */
     export type Column = {
+        /**
+         * Unique column identifier.  It is assumed to be the property name in item objects by the default 
+         * value-rendering function.
+         */
         key: string;
+        /**
+         * Column title.  It is the text shown in column headers when no header slots are used.
+         */
         title: string;
-        render?: ((item: Item, key: string) => string) | undefined;
+        /**
+         * Value-rendering function for this particular column.  If not provided, the default value-rendering function 
+         * will be use instead.
+         */
+        renderValue?: ((item: Item, key: string) => string) | undefined;
     };
+
+    /**
+     * Defines the expected properties in data item objects (the objects that represent that table's data).
+     */
     export type Item = {
+        /**
+         * Unique item identifier.  It is used to key the data rows.
+         */
         id: string | number;
+        /**
+         * Optional list of sub-items.  Items with sub-items generate sub-tables.
+         */
         subItems?: Item[] | undefined;
         [x: string]: any;
     };
+
+    /**
+     * Enumeration used to control the order of the data shown in sub-tables' captions.
+     */
     export const CaptionOrder = Object.freeze({
+        /**
+         * Show path to the left; level to the right.
+        */
         PathLevel: 1,
+        /**
+         * Show level to the left; path to the right.
+        */
         LevelPath: 2,
     });
+
+    /**
+     * Enumeration used to control how data items are grouped within the table and sub-tables.
+     */
     export const ItemGrouping = Object.freeze({
+        /**
+         * No grouping is done, and the data items are rendered in the order they are provided.
+        */
         Undefined: 0,
+        /**
+         * Data items with sub-items are moved to the top of the table.
+        */
         ExpansiblesFirst: 1,
+        /**
+         * Data items with sub-items are moved to the bottom of the table.
+        */
         ExpansiblesLast: 2,
     });
 </script>
