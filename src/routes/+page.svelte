@@ -89,6 +89,7 @@
     pathSegment={(i) => i.last_name}
     pathSeparator=" > "
     maxPathSegmentLength={10}
+    initialOpenLevel={5}
     on:toggle={(e) => console.log("Toggle!", e)}
 >
     <svelte:fragment slot="summary" let:item>

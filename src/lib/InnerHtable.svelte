@@ -82,6 +82,7 @@
     export let summary: string | ((item: Item) => string) | undefined;
     export let pathSegment: string | ((item: Item) => string) | undefined;
     export let maxPathSegmentLength: number | undefined;
+    export let initialOpenLevel: number;
 
     let regulars: Item[] = [];
     let expansibles: Item[] = [];
@@ -203,7 +204,7 @@
                 {#if item.subItems?.length}
                     {@const childPath = calculateChildPath(item)}
                     <td colspan={columns.length}>
-                        <details on:toggle={(e) => dispatch('toggle', {
+                        <details open={level + 1 <= initialOpenLevel} on:toggle={(e) => dispatch('toggle', {
                             item,
                             level: level + 1,
                             path: childPath,
@@ -226,6 +227,7 @@
                                 {summary}
                                 {maxPathSegmentLength}
                                 {pathSegment}
+                                {initialOpenLevel}
                                 on:toggle
                             >
                                 <svelte:fragment slot="summary" let:item>

@@ -49,6 +49,10 @@
      * Defines a maximum length for path segments.
      */
     export let maxPathSegmentLength: number | undefined = undefined;
+    /**
+     * Sets the maximum level of sub-tables that will be open (shown) initially.
+     */
+    export let initialOpenLevel = 1;
 
     function getSummary(item: Item) {
         if (!summary) {
@@ -83,6 +87,7 @@
     {summary}
     {pathSegment}
     {maxPathSegmentLength}
+    {initialOpenLevel}
     on:toggle
 >
     <svelte:fragment slot="summary" let:item>
