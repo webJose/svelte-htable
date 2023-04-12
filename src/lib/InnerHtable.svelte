@@ -1,5 +1,12 @@
 <script context="module" lang="ts">
     /**
+     * Function that returns a string representing a value contained in the given item and identified by the given key.
+     * @param item Data item where the value of interest resides.
+     * @param key Data item key (property name) that identifies the value of interest.
+     */
+    export declare function RenderValueFunction(item: Item, key: string): string;
+
+    /**
      * Defines the properties expected in column definitions.
      */
     export type Column = {
@@ -16,7 +23,7 @@
          * Value-rendering function for this particular column.  If not provided, the default value-rendering function
          * will be use instead.
          */
-        renderValue?: ((item: Item, key: string) => string) | undefined;
+        renderValue?: typeof RenderValueFunction | undefined;
     };
 
     /**
@@ -194,7 +201,7 @@
     <thead>
         <tr>
             {#each columns as col}
-                <th>{col.title}</th>
+                <th><slot name="headercell" {col} /></th>
             {/each}
         </tr>
     </thead>
@@ -234,6 +241,9 @@
                                 {initialOpenLevel}
                                 on:toggle
                             >
+                                <svelte:fragment slot="headercell" let:col>
+                                    <slot name="headercell" {col} />
+                                </svelte:fragment>
                                 <svelte:fragment slot="summary" let:item>
                                     <slot name="summary" {item} />
                                 </svelte:fragment>
