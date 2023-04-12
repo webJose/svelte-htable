@@ -1,5 +1,10 @@
 # svelte-htable
 
+[![NPM](https://img.shields.io/npm/v/svelte-htable?style=plastic)](https://www.npmjs.com/package/svelte-htable)
+![Latest Release](https://img.shields.io/github/v/release/webJose/svelte-htable?include_prereleases&sort=semver&style=plastic)
+![Lines of code](https://img.shields.io/tokei/lines/github/webJose/svelte-htable?style=plastic&color=blueviolet)
+![npm bundle size](https://img.shields.io/bundlephobia/min/svelte-htable?color=red&label=minified&style=plastic)
+
 This is a hierarchical table component for Svelte.  This means that it is a table that may be provided with items that 
 contain items, and said contained items need to be displayed as a sub-table.  The process can be repeated, producing 
 an arbitrary amount of nested tables.  An image is worth a thousand words:
@@ -364,13 +369,13 @@ one using this prop.
 
 All value-rendering functions are given 2 arguments:  The row's item, and the column's key.
 
-> **IMPORTANT**: Any empty strings are replaced by the `column` slot's default template with a non-breaking space 
-(`&nbsp;`) to ensure cell formatting, and you should too, if you opt to use the `column` slot.  To assist with this, 
+> **IMPORTANT**: Any empty strings are replaced by the `datacell` slot's default template with a non-breaking space 
+(`&nbsp;`) to ensure cell formatting, and you should too, if you opt to use the `datacell` slot.  To assist with this, 
 `svelte-htable` exports the `StdCell` component with this logic.  See details [here](#stdcell).
 
 ### Computed Columns
 
-The `render()` function can be used to create calculated columns.  The example screenshot at the top shows the **Age** 
+The `renderValue()` function can be used to create calculated columns.  The example screenshot at the top shows the **Age** 
 column, which is calculated by using the following column definition in the `columns` array:
 
 ```ts
@@ -389,9 +394,9 @@ column, which is calculated by using the following column definition in the `col
 ---
 
 The `renderValue()` method will only take you so far, and if complex HTML is needed inside the table cell, then you 
-must opt to use the `column` slot.
+must opt to use the `datacell` or `datarow` slots.
 
-> **Tip**:  You can, and is encouraged to, combine the use of `render()` with the `column` slot.
+> **Tip**:  You can, and is encouraged to, combine the use of `renderValue()` with the `datacell` or `datarow` slots.
 
 ### Using Slots for Table Data
 
