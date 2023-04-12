@@ -6,6 +6,7 @@
         type Column,
         type Item,
     } from "$lib/InnerHtable.svelte";
+    import StdCell from "$lib/StdCell.svelte";
     import Log from "../components/Log.svelte";
 
     interface DataItem extends Item {
@@ -123,10 +124,8 @@
                 href="https://flagpedia.net/{item.country_code.toLowerCase()}"
                 target="_blank">{value}</a
             >
-        {:else if value}
-            {value}
         {:else}
-            &nbsp;
+            <StdCell itemData={value} />
         {/if}
     </svelte:fragment>
 </Htable>
@@ -166,10 +165,8 @@
                             href="https://flagpedia.net/{item.country_code.toLowerCase()}"
                             target="_blank">{value}</a
                         >
-                    {:else if value}
-                        {value}
                     {:else}
-                        &nbsp;
+                        <StdCell itemData={value} />
                     {/if}
                 </td>
             {/each}
