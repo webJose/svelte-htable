@@ -4,7 +4,7 @@
      */
     export type Column = {
         /**
-         * Unique column identifier.  It is assumed to be the property name in item objects by the default 
+         * Unique column identifier.  It is assumed to be the property name in item objects by the default
          * value-rendering function.
          */
         key: string;
@@ -13,7 +13,7 @@
          */
         title: string;
         /**
-         * Value-rendering function for this particular column.  If not provided, the default value-rendering function 
+         * Value-rendering function for this particular column.  If not provided, the default value-rendering function
          * will be use instead.
          */
         renderValue?: ((item: Item, key: string) => string) | undefined;
@@ -40,11 +40,11 @@
     export const CaptionOrder = Object.freeze({
         /**
          * Show path to the left; level to the right.
-        */
+         */
         PathLevel: 1,
         /**
          * Show level to the left; path to the right.
-        */
+         */
         LevelPath: 2,
     });
 
@@ -54,15 +54,15 @@
     export const ItemGrouping = Object.freeze({
         /**
          * No grouping is done, and the data items are rendered in the order they are provided.
-        */
+         */
         Undefined: 0,
         /**
          * Data items with sub-items are moved to the top of the table.
-        */
+         */
         ExpansiblesFirst: 1,
         /**
          * Data items with sub-items are moved to the bottom of the table.
-        */
+         */
         ExpansiblesLast: 2,
     });
 </script>
@@ -199,17 +199,21 @@
         </tr>
     </thead>
     <tbody>
-        {#each workItems as item (item.id)}
-            <tr class:sub={item.subItems?.length}>
-                {#if item.subItems?.length}
-                    {@const childPath = calculateChildPath(item)}
+        {#each workItems as item, index (item.id)}
+            {#if item.subItems?.length}
+                {@const childPath = calculateChildPath(item)}
+                <tr class:sub={item.subItems?.length}>
                     <td colspan={columns.length}>
-                        <details open={level + 1 <= initialOpenLevel} on:toggle={(e) => dispatch('toggle', {
-                            item,
-                            level: level + 1,
-                            path: childPath,
-                            open: e.currentTarget.open
-                        })}>
+                        <details
+                            open={level + 1 <= initialOpenLevel}
+                            on:toggle={(e) =>
+                                dispatch("toggle", {
+                                    item,
+                                    level: level + 1,
+                                    path: childPath,
+                                    open: e.currentTarget.open,
+                                })}
+                        >
                             <summary>
                                 <slot name="summary" {item} />
                             </summary>
@@ -233,20 +237,16 @@
                                 <svelte:fragment slot="summary" let:item>
                                     <slot name="summary" {item} />
                                 </svelte:fragment>
-                                <svelte:fragment slot="column" let:item let:col>
-                                    <slot name="column" {item} {col} />
+                                <svelte:fragment slot="datarow" let:item let:index>
+                                    <slot name="datarow" {item} {index} />
                                 </svelte:fragment>
                             </svelte:self>
                         </details>
                     </td>
-                {:else}
-                    {#each columns as col}
-                        <td>
-                            <slot name="column" {item} {col} />
-                        </td>
-                    {/each}
-                {/if}
-            </tr>
+                </tr>
+            {:else}
+                <slot name="datarow" {item} {index} />
+            {/if}
         {/each}
     </tbody>
 </table>
