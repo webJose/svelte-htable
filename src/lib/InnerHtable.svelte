@@ -68,6 +68,8 @@
 </script>
 
 <script lang="ts">
+    import { createEventDispatcher } from "svelte";
+
     export let columns: Column[];
     export let items: Item[];
     export let level = 1;
@@ -80,9 +82,11 @@
     export let summary: string | ((item: Item) => string) | undefined;
     export let pathSegment: string | ((item: Item) => string) | undefined;
     export let maxPathSegmentLength: number | undefined;
+    export let initialOpenLevel: number;
 
     let regulars: Item[] = [];
     let expansibles: Item[] = [];
+    let dispatch = createEventDispatcher();
 
     $: {
         if (grouping !== ItemGrouping.Undefined) {
@@ -195,11 +199,17 @@
         </tr>
     </thead>
     <tbody>
-        {#each workItems as item}
+        {#each workItems as item (item.id)}
             <tr class:sub={item.subItems?.length}>
                 {#if item.subItems?.length}
+                    {@const childPath = calculateChildPath(item)}
                     <td colspan={columns.length}>
-                        <details>
+                        <details open={level + 1 <= initialOpenLevel} on:toggle={(e) => dispatch('toggle', {
+                            item,
+                            level: level + 1,
+                            path: childPath,
+                            open: e.currentTarget.open
+                        })}>
                             <summary>
                                 <slot name="summary" {item} />
                             </summary>
@@ -210,13 +220,15 @@
                                 level={level + 1}
                                 {levelFn}
                                 {showPath}
-                                path={calculateChildPath(item)}
+                                path={childPath}
                                 {pathSeparator}
                                 {captionOrder}
                                 {grouping}
                                 {summary}
                                 {maxPathSegmentLength}
                                 {pathSegment}
+                                {initialOpenLevel}
+                                on:toggle
                             >
                                 <svelte:fragment slot="summary" let:item>
                                     <slot name="summary" {item} />
