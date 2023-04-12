@@ -1,6 +1,6 @@
 {
 	"name": "svelte-htable",
-	"version": "0.0.5",
+	"version": "0.0.6",
 	"license": "MIT",
 	"description": "Svelte component that creates a hierarchical (recursive) table based on hierarchical data.",
 	"keywords": [
