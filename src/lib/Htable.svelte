@@ -62,7 +62,7 @@
             return item[summary];
         }
         return summary(item);
-    };
+    }
 
     function _renderValue(item: Item, key: string) {
         let data = item[key];
@@ -95,15 +95,23 @@
             {getSummary(item)}
         </slot>
     </svelte:fragment>
-    <svelte:fragment slot="column" let:item let:col>
-        {@const renderValue = col.renderValue ?? _renderValue}
-        {@const itemData = renderValue(item, col.key)}
-        <slot name="column" {item} {col} {renderValue}>
-            {#if itemData}
-                {itemData}
-            {:else}
-                &nbsp;
-            {/if}
+    <svelte:fragment slot="datarow" let:item let:index>
+        <slot name="datarow" {item} {index} renderValue={_renderValue}>
+            <tr class:even={index % 2 === 0} class:odd={index % 2 === 1}>
+                {#each columns as col}
+                    {@const renderValue = col.renderValue ?? _renderValue}
+                    {@const itemData = renderValue(item, col.key)}
+                    <td>
+                        <slot name="datacell" {item} {col} {renderValue}>
+                            {#if itemData}
+                                {itemData}
+                            {:else}
+                                &nbsp;
+                            {/if}
+                        </slot>
+                    </td>
+                {/each}
+            </tr>
         </slot>
     </svelte:fragment>
 </InnerHtable>

@@ -6,6 +6,7 @@
         type Column,
         type Item,
     } from "$lib/InnerHtable.svelte";
+    import Log from "../components/Log.svelte";
 
     interface DataItem extends Item {
         first_name: string;
@@ -75,7 +76,62 @@
             return prev;
         }, [] as DataItem[]);
     }
+
+    let flagCountryCode = '';
+    let messages: string[] = [];
+    const maxMessages = 10;
+
+    function pushMessage(msg: string) {
+        if (messages.length >= maxMessages) {
+            messages = messages.slice(0, maxMessages - 1);
+        }
+        messages.unshift(msg);
+        messages = messages;
+        console.log(msg);
+    }
 </script>
+
+<Log title="Toggle Messages" {messages} />
+
+<Htable
+    class="data"
+    items={buildData(data.data)}
+    {columns}
+    level={(l) => `Level: ${l}`}
+    showPath={true}
+    captionOrder={CaptionOrder.LevelPath}
+    summary={(i) => `${i.last_name}, ${i.first_name}`}
+    grouping={ItemGrouping.Undefined}
+    pathSegment={(i) => i.last_name}
+    pathSeparator=" > "
+    maxPathSegmentLength={10}
+    on:toggle={(e) => pushMessage(`Item ${e.detail.item.id} ${e.detail.open ? 'opened' : 'closed'} (level ${e.detail.level}).`)}
+>
+    <svelte:fragment slot="summary" let:item>
+        <img
+            class="flag"
+            src="https://flagcdn.com/{item.country_code.toLowerCase()}.svg"
+            alt={item.country_code}
+        />&nbsp;{item.last_name},&nbsp;{item.first_name}
+    </svelte:fragment>
+    <svelte:fragment slot="datacell" let:item let:col let:renderValue>
+        {@const value = renderValue(item, col.key)}
+        {#if col.key === "id"}
+            <div class="inverted">{value}</div>
+        {:else if col.key === "country_code"}
+            <a
+                href="https://flagpedia.net/{item.country_code.toLowerCase()}"
+                target="_blank">{value}</a
+            >
+        {:else if value}
+            {value}
+        {:else}
+            &nbsp;
+        {/if}
+    </svelte:fragment>
+</Htable>
+
+<label>Type a country code to flag the containing lines: <input type="text" bind:value={flagCountryCode} /></label>
 
 <Htable
     class="data"
@@ -90,7 +146,6 @@
     pathSeparator=" > "
     maxPathSegmentLength={10}
     initialOpenLevel={5}
-    on:toggle={(e) => console.log("Toggle!", e)}
 >
     <svelte:fragment slot="summary" let:item>
         <img
@@ -99,22 +154,26 @@
             alt={item.country_code}
         />&nbsp;{item.last_name},&nbsp;{item.first_name}
     </svelte:fragment>
-    <svelte:fragment slot="column" let:item let:col let:renderValue>
-        {@const value = renderValue(item, col.key)}
-        {#if col.key === "id"}
-            <span class="inverted">{value}</span>
-        {:else if col.key === "country_code"}
-            <a
-                href="https://flagpedia.net/{item.country_code.toLowerCase()}"
-                target="_blank">{value}</a
-            >
-        {:else}
-            {#if value}
-                {value}
-            {:else}
-                &nbsp;
-            {/if}
-        {/if}
+    <svelte:fragment slot="datarow" let:item let:renderValue>
+        <tr class:flag={item.country_code === flagCountryCode}>
+            {#each columns as col}
+                {@const value = (col.renderValue ?? renderValue)(item, col.key)}
+                <td>
+                    {#if col.key === "id"}
+                        <div class="inverted">{value}</div>
+                    {:else if col.key === "country_code"}
+                        <a
+                            href="https://flagpedia.net/{item.country_code.toLowerCase()}"
+                            target="_blank">{value}</a
+                        >
+                    {:else if value}
+                        {value}
+                    {:else}
+                        &nbsp;
+                    {/if}
+                </td>
+            {/each}
+        </tr>
     </svelte:fragment>
 </Htable>
 
@@ -180,14 +239,21 @@
         background-color: var(--tableColor);
     }
 
-    :global(table.data > tbody > tr > td > span.inverted) {
+    :global(table.data > tbody > tr > td > div.inverted) {
         background-color: var(--tableTextColor);
         color: var(--tableColor);
-        width: 100%;
-        display: inline-block;
         font-weight: bold;
         padding: 0.1em 0.3em;
         text-align: center;
+    }
+
+    :global(table.data > tbody > tr.flag) {
+        background-color: rgb(169, 0, 0);
+        font-weight: bold;
+    }
+
+    :global(table.data > tbody > tr.flag > *) {
+        color: yellow;
     }
 
     img.flag {
