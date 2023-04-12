@@ -34,12 +34,12 @@
         {
             key: "birth_date",
             title: "Birth Date",
-            render: (i, k) => new Date(i[k]).toLocaleDateString(),
+            renderValue: (i, k) => new Date(i[k]).toLocaleDateString(),
         },
         {
             key: "age",
             title: "Age",
-            render: (i, k) => {
+            renderValue: (i, k) => {
                 const diff = Date.now() - Date.parse(i.birth_date);
                 return Math.floor(
                     diff / (365 * 24 * 60 * 60 * 1000)
@@ -97,8 +97,8 @@
             alt={item.country_code}
         />&nbsp;{item.last_name},&nbsp;{item.first_name}
     </svelte:fragment>
-    <svelte:fragment slot="column" let:item let:col let:render>
-        {@const value = render(item, col.key)}
+    <svelte:fragment slot="column" let:item let:col let:renderValue>
+        {@const value = renderValue(item, col.key)}
         {#if col.key === "id"}
             <span class="inverted">{value}</span>
         {:else if col.key === "country_code"}
