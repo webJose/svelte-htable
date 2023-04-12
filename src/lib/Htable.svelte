@@ -54,6 +54,10 @@
      * Sets the maximum level of sub-tables that will be open (shown) initially.
      */
     export let initialOpenLevel = 1;
+    /**
+     * Defines the text that is used by the default render function for null property values.
+     */
+    export let nullText = '(---)';
 
     function getSummary(item: Item) {
         if (!summary) {
@@ -68,7 +72,7 @@
     function _renderValue(item: Item, key: string) {
         let data = item[key];
         if (data === null) {
-            return "(null)";
+            return nullText;
         } else if (data === undefined) {
             return "";
         }
