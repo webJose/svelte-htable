@@ -89,6 +89,7 @@
     pathSegment={(i) => i.last_name}
     pathSeparator=" > "
     maxPathSegmentLength={10}
+    on:toggle={(e) => console.log("Toggle!", e)}
 >
     <svelte:fragment slot="summary" let:item>
         <img
@@ -126,6 +127,7 @@
     :global(body) {
         font-family: Verdana, Geneva, Tahoma, sans-serif;
         background-color: rgb(6, 6, 42);
+        color: white;
     }
     :global(table.data) {
         --tableColor: rgb(16, 16, 61);

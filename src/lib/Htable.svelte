@@ -83,6 +83,7 @@
     {summary}
     {pathSegment}
     {maxPathSegmentLength}
+    on:toggle
 >
     <svelte:fragment slot="summary" let:item>
         <slot name="summary" {item}>
