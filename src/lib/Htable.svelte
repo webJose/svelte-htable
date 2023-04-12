@@ -5,6 +5,7 @@
         type Column,
         type Item,
     } from "./InnerHtable.svelte";
+    import StdCell from "./StdCell.svelte";
 
     /**
      * List of column definitions.  The order in the list determines the order of columns in the tables.
@@ -90,6 +91,11 @@
     {initialOpenLevel}
     on:toggle
 >
+    <svelte:fragment slot="headercell" let:col>
+        <slot name="headercell" {col}>
+            {col.title}
+        </slot>
+    </svelte:fragment>
     <svelte:fragment slot="summary" let:item>
         <slot name="summary" {item}>
             {getSummary(item)}
@@ -103,11 +109,7 @@
                     {@const itemData = renderValue(item, col.key)}
                     <td>
                         <slot name="datacell" {item} {col} {renderValue}>
-                            {#if itemData}
-                                {itemData}
-                            {:else}
-                                &nbsp;
-                            {/if}
+                            <StdCell {itemData} />
                         </slot>
                     </td>
                 {/each}
