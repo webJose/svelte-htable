@@ -74,14 +74,14 @@
     });
 </script>
 
-<script lang="ts">
-    import { type Snippet } from 'svelte';
+<script lang="ts" generics="TItem extends Item = Item, TColumn extends Column = Column">
+    import type { Snippet } from 'svelte';
     import type { HTMLTableAttributes } from 'svelte/elements';
     import Self from './InnerHtable.svelte';
 
     type Props = HTMLTableAttributes & {
-        columns: Column[];
-        items: Item[];
+        columns: TColumn[];
+        items: TItem[];
         level?: number;
         levelFn?: boolean | ((level: number) => string);
         showPath?: boolean;
@@ -89,15 +89,15 @@
         pathSeparator?: string;
         captionOrder?: number;
         grouping?: number;
-        summary?: string | ((item: Item) => string);
-        pathSegment?: string | ((item: Item) => string);
+        summary?: string | ((item: TItem) => string);
+        pathSegment?: string | ((item: TItem) => string);
         maxPathSegmentLength?: number;
         initialOpenLevel?: number;
         class?: string;
-        headerCell?: Snippet<[Column]>;
-        summarySnippet?: Snippet<[Item]>;
-        dataRow?: Snippet<[Item, number]>;
-        onToggle?: (x: { item: Item; level: number; path: string; open: boolean }) => void;
+        headerCell?: Snippet<[TColumn]>;
+        summarySnippet?: Snippet<[TItem]>;
+        dataRow?: Snippet<[TItem, number]>;
+        onToggle?: (x: { item: TItem; level: number; path: string; open: boolean }) => void;
     };
 
     let {
@@ -123,8 +123,8 @@
     }: Props = $props();
 
     const regularsAndExpansibles = $derived.by(() => {
-        let regulars: Item[] = [];
-        let expansibles: Item[] = [];
+        let regulars: TItem[] = [];
+        let expansibles: TItem[] = [];
         items.forEach((i) => {
             if (i.subItems?.length) {
                 expansibles.push(i);
@@ -179,7 +179,7 @@
         return shouldShowLevel() ? buildLevelText() : '';
     }
 
-    function calculateChildPath(item: Item) {
+    function calculateChildPath(item: TItem) {
         let childSegment: string;
         if (pathSegment === undefined) {
             childSegment = item[columns[0].key];
