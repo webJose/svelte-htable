@@ -189,7 +189,7 @@ element.  Each of these are assigned a CSS class based on their position.  The o
 class; the one to the right, `cpt-r`.  Use these classes to style the pieces of information shown in the caption.
 
 > **NOTE**:  What's shown to the left or the right depends on the value of the `captionOrder` prop as explained in the 
-next section.
+[props](#htables-props) section.
 
 ### Styling Expansibles
 
