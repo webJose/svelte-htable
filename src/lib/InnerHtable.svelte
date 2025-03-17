@@ -1,4 +1,4 @@
-<script context="module" lang="ts">
+<script module lang="ts">
     /**
      * Function that returns a string representing a value contained in the given item and identified by the given key.
      * @param item Data item where the value of interest resides.
@@ -75,50 +75,78 @@
 </script>
 
 <script lang="ts">
-    import { createEventDispatcher } from "svelte";
+    import { type Snippet } from 'svelte';
+    import type { HTMLTableAttributes } from 'svelte/elements';
+    import Self from './InnerHtable.svelte';
 
-    export let columns: Column[];
-    export let items: Item[];
-    export let level = 1;
-    export let levelFn: boolean | ((level: number) => string) | undefined;
-    export let showPath: boolean;
-    export let path = "";
-    export let pathSeparator: string;
-    export let captionOrder: number;
-    export let grouping: number;
-    export let summary: string | ((item: Item) => string) | undefined;
-    export let pathSegment: string | ((item: Item) => string) | undefined;
-    export let maxPathSegmentLength: number | undefined;
-    export let initialOpenLevel: number;
+    type Props = HTMLTableAttributes & {
+        columns: Column[];
+        items: Item[];
+        level?: number;
+        levelFn?: boolean | ((level: number) => string);
+        showPath?: boolean;
+        path?: string;
+        pathSeparator?: string;
+        captionOrder?: number;
+        grouping?: number;
+        summary?: string | ((item: Item) => string);
+        pathSegment?: string | ((item: Item) => string);
+        maxPathSegmentLength?: number;
+        initialOpenLevel?: number;
+        class?: string;
+        headerCell?: Snippet<[Column]>;
+        summarySnippet?: Snippet<[Item]>;
+        dataRow?: Snippet<[Item, number]>;
+        onToggle?: (x: { item: Item; level: number; path: string; open: boolean }) => void;
+    };
 
-    let regulars: Item[] = [];
-    let expansibles: Item[] = [];
-    let dispatch = createEventDispatcher();
+    let {
+        columns,
+        items,
+        level = 1,
+        levelFn,
+        showPath,
+        path = '',
+        pathSeparator,
+        captionOrder = CaptionOrder.PathLevel,
+        grouping = ItemGrouping.Undefined,
+        summary,
+        pathSegment,
+        maxPathSegmentLength,
+        initialOpenLevel = 1,
+        class: cssClass,
+        headerCell,
+        summarySnippet,
+        dataRow,
+        onToggle,
+        ...restProps
+    }: Props = $props();
 
-    $: {
-        if (grouping !== ItemGrouping.Undefined) {
-            items.forEach((i) => {
-                if (i.subItems?.length) {
-                    expansibles.push(i);
-                } else {
-                    regulars.push(i);
-                }
-            });
-            regulars = regulars;
-            expansibles = expansibles;
-        }
-    }
-    $: workItems =
+    const regularsAndExpansibles = $derived.by(() => {
+        let regulars: Item[] = [];
+        let expansibles: Item[] = [];
+        items.forEach((i) => {
+            if (i.subItems?.length) {
+                expansibles.push(i);
+            } else {
+                regulars.push(i);
+            }
+        });
+        return { regulars, expansibles };
+    });
+    const workItems = $derived(
         grouping === ItemGrouping.ExpansiblesFirst
-            ? [...expansibles, ...regulars]
+            ? [...regularsAndExpansibles.expansibles, ...regularsAndExpansibles.regulars]
             : grouping === ItemGrouping.ExpansiblesLast
-            ? [...regulars, ...expansibles]
-            : items;
-    $: leftCaptionText = buildLeftCaptionText();
-    $: rightCaptionText = buildRightCaptionText();
+              ? [...regularsAndExpansibles.regulars, ...regularsAndExpansibles.expansibles]
+              : items,
+    );
+    const leftCaptionText = $derived(buildLeftCaptionText());
+    const rightCaptionText = $derived(buildRightCaptionText());
+    const shouldShowPath = $derived(!!(showPath && path));
 
     function buildLevelText() {
-        if (typeof levelFn === "function") {
+        if (typeof levelFn === 'function') {
             return levelFn(level);
         }
         return level.toString();
@@ -126,65 +154,52 @@
 
     function shouldShowLevel() {
         let should = false;
-        if (typeof levelFn === "boolean") {
+        if (typeof levelFn === 'boolean') {
             should = levelFn;
-        } else if (typeof levelFn === "function") {
+        } else if (typeof levelFn === 'function') {
             should = true;
         }
         return should && level > 1;
     }
 
-    function shouldShowPath() {
-        return !!(showPath && path);
-    }
-
     function buildLeftCaptionText() {
-        let text = "";
+        let text = '';
         if (captionOrder === CaptionOrder.LevelPath) {
-            text = shouldShowLevel() ? buildLevelText() : "";
+            text = shouldShowLevel() ? buildLevelText() : '';
         } else {
-            text = shouldShowPath() ? path : "";
+            text = shouldShowPath ? path : '';
         }
-        return text ?? "&nbsp;";
+        return text ?? '&nbsp;';
     }
 
     function buildRightCaptionText() {
         if (captionOrder === CaptionOrder.LevelPath) {
-            return shouldShowPath() ? path : "";
+            return shouldShowPath ? path : '';
         }
-        return shouldShowLevel() ? buildLevelText() : "";
+        return shouldShowLevel() ? buildLevelText() : '';
     }
 
     function calculateChildPath(item: Item) {
         let childSegment: string;
         if (pathSegment === undefined) {
             childSegment = item[columns[0].key];
-        } else if (typeof pathSegment === "string") {
+        } else if (typeof pathSegment === 'string') {
             childSegment = item[pathSegment];
         } else {
             childSegment = pathSegment(item);
         }
-        if (
-            maxPathSegmentLength !== undefined &&
-            childSegment.length > maxPathSegmentLength
-        ) {
-            childSegment = `${childSegment.substring(
-                0,
-                maxPathSegmentLength - 1
-            )}&hellip;`;
+        if (maxPathSegmentLength !== undefined && childSegment.length > maxPathSegmentLength) {
+            childSegment = `${childSegment.substring(0, maxPathSegmentLength - 1)}&hellip;`;
         }
-        return `${path}${path.length ? pathSeparator : ""}${childSegment}`;
+        return `${path}${path.length ? pathSeparator : ''}${childSegment}`;
     }
 </script>
 
 <table
-    class={($$restProps.class ?? "") +
-        (level > 1
-            ? ` sub sub-${level} sub-${level % 2 === 0 ? "even" : "odd"}`
-            : "")}
+    class={[cssClass, { [`sub sub-${level} sub-${level % 2 === 0 ? 'even' : 'odd'}`]: level > 1 }]}
     data-level={level}
 >
-    {#if shouldShowLevel() || shouldShowPath()}
+    {#if shouldShowLevel() || shouldShowPath}
         <caption>
             <span>
                 <span class="cpt-l">
@@ -201,7 +216,7 @@
     <thead>
         <tr>
             {#each columns as col}
-                <th><slot name="headercell" {col} /></th>
+                <th>{@render headerCell?.(col)}</th>
             {/each}
         </tr>
     </thead>
@@ -213,8 +228,8 @@
                     <td colspan={columns.length}>
                         <details
                             open={level + 1 <= initialOpenLevel}
-                            on:toggle={(e) =>
-                                dispatch("toggle", {
+                            ontoggle={(e) =>
+                                onToggle?.({
                                     item,
                                     level: level + 1,
                                     path: childPath,
@@ -222,12 +237,12 @@
                                 })}
                         >
                             <summary>
-                                <slot name="summary" {item} />
+                                {@render summarySnippet?.(item)}
                             </summary>
-                            <svelte:self
+                            <Self
                                 {columns}
                                 items={item.subItems}
-                                class={$$restProps.class}
+                                class={cssClass}
                                 level={level + 1}
                                 {levelFn}
                                 {showPath}
@@ -239,23 +254,16 @@
                                 {maxPathSegmentLength}
                                 {pathSegment}
                                 {initialOpenLevel}
+                                {headerCell}
+                                {summarySnippet}
+                                {dataRow}
                                 on:toggle
-                            >
-                                <svelte:fragment slot="headercell" let:col>
-                                    <slot name="headercell" {col} />
-                                </svelte:fragment>
-                                <svelte:fragment slot="summary" let:item>
-                                    <slot name="summary" {item} />
-                                </svelte:fragment>
-                                <svelte:fragment slot="datarow" let:item let:index>
-                                    <slot name="datarow" {item} {index} />
-                                </svelte:fragment>
-                            </svelte:self>
+                            />
                         </details>
                     </td>
                 </tr>
             {:else}
-                <slot name="datarow" {item} {index} />
+                {@render dataRow?.(item, index)}
             {/if}
         {/each}
     </tbody>
